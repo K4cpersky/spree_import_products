@@ -1,8 +1,7 @@
 module SpreeImportProducts
   module Spree
     module ProductsControllerDecorator
-      def import
-      end
+      def import; end
     end
   end
 end
