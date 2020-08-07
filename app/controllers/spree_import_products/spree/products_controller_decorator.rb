@@ -1,8 +1,12 @@
 module SpreeImportProducts
   module Spree
     module ProductsControllerDecorator
+      # def self.prepended(base)
+      #   base.before_action :load_data, only: :some_action
+      # end
+
       def import
-        Sheet::Process.call(import_permitted_params)
+        Product::Service.call(import_permitted_params)
 
         head :ok
       end
@@ -16,4 +20,5 @@ module SpreeImportProducts
   end
 end
 
-Spree::ProductsController.prepend SpreeImportProducts::Spree::ProductsControllerDecorator
+Spree::ProductsController.prepend SpreeImportProducts::Spree::ProductsControllerDecorator if
+  ::Spree::ProductsController.included_modules.exclude?(SpreeImportProducts::Spree::ProductsControllerDecorator)
