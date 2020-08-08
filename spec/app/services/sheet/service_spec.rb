@@ -12,7 +12,7 @@ RSpec.describe Sheet::Service do
     it 'creates instance ' do
       expect(Sheet::Validator)
         .to receive_message_chain(:new, :call)
-        .with(sheet: sheet)
+        .with(file: sheet)
 
       call
     end
