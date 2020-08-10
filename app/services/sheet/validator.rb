@@ -6,7 +6,7 @@ require 'csv'
 
 class Sheet::Validator < Dry::Validation::Contract
   # TODO: Sprawdzic czy input jest plikiem
-  # - niech csv bedzie tworzony przy uzyciu factories
+  # TODO: - niech csv bedzie tworzony przy uzyciu factories
   params do
     required(:file)
   end

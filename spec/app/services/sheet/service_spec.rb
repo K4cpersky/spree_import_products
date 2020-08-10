@@ -1,5 +1,5 @@
 require 'spec_helper'
-
+#TODO: Czy robie mocki poprawnie
 RSpec.describe Sheet::Service do
   describe '.call' do
     subject(:call) { described_class.call(sheet) }
@@ -9,7 +9,7 @@ RSpec.describe Sheet::Service do
       { file: file }
     end
 
-    it 'creates instance ' do
+    it 'calls validator' do
       expect(Sheet::Validator)
         .to receive_message_chain(:new, :call)
         .with(file: sheet)
@@ -18,10 +18,8 @@ RSpec.describe Sheet::Service do
     end
 
     it 'calls sheet processor' do
-      expect(Sheet::Process)
-        .to receive(:call)
-        .with(sheet)
-        .and_call_original
+      expect(Sheet::Processor)
+        .to receive_message_chain(:new, :call)
 
       call
     end
