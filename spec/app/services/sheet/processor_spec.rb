@@ -10,14 +10,17 @@ RSpec.describe Sheet::Processor do
     end
     let(:table) { CSV.parse(File.read(data[:file]), col_sep: ';', headers: true) }
 
+    let(:headers) { table.headers.compact.all? { |element| element.class == String } }
+    let(:parsed_headers) { subject.products.map { |product| product.keys.all? { |key| key.class == Symbol } }.uniq.first }
+
     let(:availability_date_column) { table.by_col["availability_date"].compact.all? { |element| element.class == String } }
-    let(:parsed_availability_date_column) { subject.products.map { |p| p["availability_date"].class == DateTime }.uniq.first }
+    let(:parsed_availability_date_column) { subject.products.map { |p| p[:availability_date].class == DateTime }.uniq.first }
 
     let(:stock_total_column) { table.by_col["stock_total"].compact.all? { |element| element.class == String } }
-    let(:parsed_stock_total_column) { subject.products.map { |p| p["stock_total"].class == Integer }.uniq.first }
+    let(:parsed_stock_total_column) { subject.products.map { |p| p[:stock_total].class == Integer }.uniq.first }
 
     let(:price_column) { table.by_col["price"].compact.all? { |element| element.class == String } }
-    let(:parsed_price_column) { subject.products.map { |p| p["price"].class == Float }.uniq.first }
+    let(:parsed_price_column) { subject.products.map { |p| p[:price].class == Float }.uniq.first }
 
     let(:table_length) { 21 }
     let(:products_amount) { 3 }
@@ -27,6 +30,14 @@ RSpec.describe Sheet::Processor do
     let(:csv_products_amount) { CSV.parse(File.read(data[:file]), col_sep: ';').map(&:compact).reject!(&:empty?).drop(1).length }
     let(:parsed_products_amount) { subject.products.length }
 
+    it 'converts headers to symbols' do
+      expect(headers).to be true
+      expect(subject.products).to be_empty
+
+      subject.call
+
+      expect(parsed_headers).to be true
+    end
 
     it 'converts availability_date column to datetime' do
       expect(availability_date_column).to be true

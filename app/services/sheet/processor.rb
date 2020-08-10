@@ -12,15 +12,22 @@ class Sheet::Processor
   # TODO: Should it be here?
   CSV::Converters[:price] = lambda { |value, field_info|
     case field_info.header
-    when 'price'
+    when :price
       value.gsub!(',', '.').to_f
     else
       value
     end
   }
+  CSV::Converters[:symbol] = lambda { |value|
+    begin
+                     value.to_sym
+    rescue StandardError
+      value
+                   end
+  }
 
   def call
-    CSV.foreach(@sheet, col_sep: ';', headers: true, converters: [:date_time, :integer, :price]) do |row|
+    CSV.foreach(@sheet, col_sep: ';', headers: true, header_converters: :symbol, converters: [:date_time, :integer, :price]) do |row|
       row.fields.compact.empty? ? next : push_row(row)
     end
   end
