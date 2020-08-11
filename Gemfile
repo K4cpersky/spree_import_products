@@ -8,5 +8,9 @@ end
 gem 'spree', github: 'spree/spree', branch: 'master'
 gem 'rails-controller-testing'
 gem 'dry-validation', '~> 1.5'
+group :test do
+  gem 'factory_bot_rails'
+  gem 'faker'
+end
 
 gemspec

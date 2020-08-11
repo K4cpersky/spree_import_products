@@ -9,6 +9,7 @@ RSpec.describe Product::Service do
       { file: file }
     end
     let(:table) { Sheet::Service.call(sheet) }
+    let!(:stock_location) { create(:stock_location) }
 
     it 'calls sheet service' do
       expect(Sheet::Service)

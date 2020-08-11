@@ -3,6 +3,7 @@ require 'spec_helper'
 RSpec.describe Spree::ProductsController, type: :controller do
   describe 'POST #import' do
     let(:file) { fixture_file_upload('spec/factories/files/sample.csv', 'text/csv') }
+    let!(:stock_location) { create(:stock_location) }
 
     subject(:post_import) do
       post :import, params: { data: { attributes: { file: file } } }
