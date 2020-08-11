@@ -1,5 +1,5 @@
 require 'spec_helper'
-#TODO: Czy robie mocki poprawnie
+#TODO: Ogarnij stabowanie i mockowanie
 RSpec.describe Sheet::Service do
   describe '.call' do
     subject(:call) { described_class.call(sheet) }
@@ -13,13 +13,6 @@ RSpec.describe Sheet::Service do
       expect(Sheet::Validator)
         .to receive_message_chain(:new, :call)
         .with(file: sheet)
-
-      call
-    end
-
-    it 'calls sheet processor' do
-      expect(Sheet::Processor)
-        .to receive_message_chain(:new, :call)
 
       call
     end

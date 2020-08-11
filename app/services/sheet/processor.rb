@@ -7,8 +7,6 @@ class Sheet::Processor
     @sheet = sheet[:file]
     @products = []
   end
-
-  # TODO: Convert headers to symbols
   # TODO: Should it be here?
   CSV::Converters[:price] = lambda { |value, field_info|
     case field_info.header
@@ -17,6 +15,9 @@ class Sheet::Processor
     else
       value
     end
+  }
+  CSV::HeaderConverters[:map_headers] = lambda { |header|
+    header == 'availability_date' ? 'available_on' : header
   }
   CSV::Converters[:symbol] = lambda { |value|
     begin
@@ -27,7 +28,7 @@ class Sheet::Processor
   }
 
   def call
-    CSV.foreach(@sheet, col_sep: ';', headers: true, header_converters: :symbol, converters: [:date_time, :integer, :price]) do |row|
+    CSV.foreach(@sheet, col_sep: ';', headers: true, header_converters: [:map_headers, :symbol], converters: [:date_time, :integer, :price]) do |row|
       row.fields.compact.empty? ? next : push_row(row)
     end
   end

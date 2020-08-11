@@ -13,8 +13,11 @@ RSpec.describe Sheet::Processor do
     let(:headers) { table.headers.compact.all? { |element| element.class == String } }
     let(:parsed_headers) { subject.products.map { |product| product.keys.all? { |key| key.class == Symbol } }.uniq.first }
 
-    let(:availability_date_column) { table.by_col["availability_date"].compact.all? { |element| element.class == String } }
-    let(:parsed_availability_date_column) { subject.products.map { |p| p[:availability_date].class == DateTime }.uniq.first }
+    let(:availability_date_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:availability_date)}.uniq.first }
+    let(:available_on_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:available_on)}.uniq.first }
+    #TODO: Czy moze tak byc ze atrybut zmienia nazwe, testy nie sa odizolowane
+    let(:availability_date_column_type) { table.by_col["availability_date"].compact.all? { |element| element.class == String } }
+    let(:parsed_availability_date_column_type) { subject.products.map { |p| p[:available_on].class == DateTime }.uniq.first }
 
     let(:stock_total_column) { table.by_col["stock_total"].compact.all? { |element| element.class == String } }
     let(:parsed_stock_total_column) { subject.products.map { |p| p[:stock_total].class == Integer }.uniq.first }
@@ -39,13 +42,23 @@ RSpec.describe Sheet::Processor do
       expect(parsed_headers).to be true
     end
 
-    it 'converts availability_date column to datetime' do
-      expect(availability_date_column).to be true
+    it 'renames available_on column' do
+      expect(table.headers).to include "availability_date"
+      expect(table.headers).not_to include "available_on"
+
+      subject.call
+
+      expect(availability_date_presence).to be false
+      expect(available_on_presence).to be true
+    end
+
+    it 'converts available_on column to datetime' do
+      expect(availability_date_column_type).to be true
       expect(subject.products).to be_empty
 
       subject.call
 
-      expect(parsed_availability_date_column).to be true
+      expect(parsed_availability_date_column_type).to be true
     end
 
     it 'converts stock_total to integer' do

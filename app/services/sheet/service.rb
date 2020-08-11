@@ -1,6 +1,8 @@
 class Sheet::Service
   def self.call(sheet)
     Sheet::Validator.new.call(file: sheet)
-    Sheet::Processor.new(sheet).call
+    @sheet = Sheet::Processor.new(sheet)
+    @sheet.call
+    @sheet.products
   end
 end
