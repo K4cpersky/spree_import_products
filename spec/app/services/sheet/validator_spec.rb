@@ -70,15 +70,15 @@ RSpec.describe Sheet::Validator do
       end
     end
 
-    context 'when rows are empty' do
-      let(:file) { fixture_file_upload('spec/factories/files/empty_rows_sample.csv', 'text/csv') }
+    context 'when rows are blank' do
+      let(:file) { fixture_file_upload('spec/factories/files/blank_rows_sample.csv', 'text/csv') }
       let(:data) do
         { file: sheet }
       end
 
-      it 'returns empty rows error' do
+      it 'returns lack of rows error' do
         expect(subject.success?).to be false
-        expect(subject.errors[:file][0]).to eq 'file has empty rows'
+        expect(subject.errors[:file][0]).to eq 'lack of rows'
       end
     end
   end

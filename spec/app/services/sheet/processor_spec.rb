@@ -29,8 +29,6 @@ RSpec.describe Sheet::Processor do
     let(:products_amount) { 3 }
     let(:row_length) { 8 }
     let(:parsed_row_length) { 7 }
-
-    let(:csv_products_amount) { CSV.parse(File.read(data[:file]), col_sep: ';').map(&:compact).reject!(&:empty?).drop(1).length }
     let(:parsed_products_amount) { subject.products.length }
 
     it 'converts headers to symbols' do
@@ -79,7 +77,7 @@ RSpec.describe Sheet::Processor do
       expect(parsed_price_column).to be true
     end
 
-    it 'removes empty rows' do
+    it 'removes blank rows' do
       expect(table.length).to eq table_length
 
       subject.call
@@ -87,7 +85,7 @@ RSpec.describe Sheet::Processor do
       expect(parsed_products_amount).to eq products_amount
     end
 
-    it 'removes empty values from row' do
+    it 'removes blank values from row' do
       expect(table.first.length).to eq row_length
 
       subject.call
@@ -98,7 +96,7 @@ RSpec.describe Sheet::Processor do
     it 'returns same amount of objects' do
       subject.call
 
-      expect(csv_products_amount).to eq parsed_products_amount
+      expect(products_amount).to eq parsed_products_amount
     end
   end
 end

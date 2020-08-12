@@ -11,7 +11,7 @@ class Sheet::Processor
   CSV::Converters[:price] = lambda { |value, field_info|
     case field_info.header
     when :price
-      value.gsub!(',', '.').to_f
+      value.blank? ? value : value.gsub!(',', '.').to_f
     else
       value
     end
@@ -29,7 +29,7 @@ class Sheet::Processor
 
   def call
     CSV.foreach(@sheet, col_sep: ';', headers: true, header_converters: [:map_headers, :symbol], converters: [:date_time, :integer, :price]) do |row|
-      row.fields.compact.empty? ? next : push_row(row)
+      row.fields.reject(&:blank?).empty? ? next : push_row(row)
     end
   end
 
@@ -42,6 +42,6 @@ class Sheet::Processor
   end
 
   def compact_row(row)
-    row.delete_if { |_k, v| v.nil? }
+    row.delete_if { |_k, v| v.blank? }
   end
 end

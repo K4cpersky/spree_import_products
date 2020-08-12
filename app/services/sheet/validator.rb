@@ -7,6 +7,7 @@ require 'csv'
 class Sheet::Validator < Dry::Validation::Contract
   # TODO: Sprawdzic czy input jest plikiem
   # TODO: - niech csv bedzie tworzony przy uzyciu factories
+  # TODO: moze sprawdzac czy wartosci sa rozdzielone przecinkiem?
   params do
     required(:file)
   end
@@ -27,7 +28,7 @@ class Sheet::Validator < Dry::Validation::Contract
 
   rule(:file) do
     if file_has_data?(value)
-      key.failure('file has empty rows') unless any_row_given?(value)
+      key.failure('lack of rows') unless any_row_given?(value)
     end
   end
 
@@ -38,7 +39,7 @@ class Sheet::Validator < Dry::Validation::Contract
   end
 
   def file_has_data?(value)
-    CSV.parse(File.read(value[:file])).any?
+    CSV.parse(File.read(value[:file]), col_sep: ';', headers: true).any?
   end
 
   def required_columns_given?(value)
@@ -48,6 +49,6 @@ class Sheet::Validator < Dry::Validation::Contract
   end
 
   def any_row_given?(value)
-    CSV.parse(File.read(value[:file]), col_sep: ';').drop(1).flatten.compact.any?
+    CSV.parse(File.read(value[:file]), col_sep: ';').drop(1).flatten.reject(&:blank?).any?
   end
 end
