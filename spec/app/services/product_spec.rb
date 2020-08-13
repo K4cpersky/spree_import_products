@@ -9,7 +9,6 @@ RSpec.describe Product do
       { file: file }
     end
     # let(:table) { Sheet.call(sheet) }
-    let!(:stock_location) { create(:stock_location, name: "Default") }
 
     # TODO
     # it 'calls sheet service' do

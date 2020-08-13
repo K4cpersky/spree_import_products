@@ -1,3 +1,14 @@
+require 'spec_helper'
+
+RSpec.describe Product::Importer do
+  describe '.import' do
+    subject(:product_importer) { described_class.import(parse_result) }
+
+    context 'when data is valid' do
+    end
+  end
+end
+
 # it 'uses existing shipping category record' do
 #   expect { subject }.to change { Spree::ShippingCategory.count }.by(0)
 # end

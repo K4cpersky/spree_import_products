@@ -2,8 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Spree::ProductsController, type: :controller do
   describe 'POST #import' do
-    let!(:stock_location) { create(:stock_location, name: "Default") }
-
     subject(:post_import) do
       post :import, params: { data: { attributes: { file: file } } }
     end

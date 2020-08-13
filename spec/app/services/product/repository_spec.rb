@@ -4,11 +4,13 @@ RSpec.describe Product::Repository do
   describe '.create' do
     subject(:product_repository) { described_class.create(products) }
 
-    let!(:shipping_category) { create(:shipping_category, name: "Bags") }
+    let(:stock_total) { 7 }
+    let!(:shipping_category) { create(:shipping_category, name: "Default") }
     let!(:stock_location) { create(:stock_location, name: "Default") }
+    let(:taxon) { create(:taxon) }
 
     context 'when data is valid' do
-      context 'when one product is imported' do
+      context 'when product is imported' do
         let(:product) { build(:product) }
         let(:products) {
           {
@@ -17,8 +19,10 @@ RSpec.describe Product::Repository do
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            shipping_category: shipping_category
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
 
@@ -36,8 +40,10 @@ RSpec.describe Product::Repository do
             price: product.price,
             available_on: product.available_on,
             slug: product.slug,
-            stock_total: 15,
-            shipping_category: shipping_category
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
 
@@ -48,7 +54,7 @@ RSpec.describe Product::Repository do
         end
       end
 
-      context 'when imported product has empty description, available_on, slug and stock_total attributes' do
+      context 'when imported product has empty description, available_on, slug, stock_total and taxons attributes' do
         let!(:product) { build(:product) }
         let(:products) {
           {
@@ -58,7 +64,9 @@ RSpec.describe Product::Repository do
             available_on: nil,
             slug: nil,
             stock_total: nil,
-            shipping_category: shipping_category
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: nil
           }
         }
 
@@ -67,7 +75,7 @@ RSpec.describe Product::Repository do
         end
       end
 
-      context 'when stock_total is given' do
+      context 'when stock_total and stock_location are given' do
         let!(:product) { build(:product) }
         let!(:additional_stock_location) { create(:stock_location) }
         let(:products) {
@@ -77,11 +85,13 @@ RSpec.describe Product::Repository do
             price: product.price,
             available_on: product.available_on,
             slug: product.slug,
-            stock_total: 7,
-            shipping_category: shipping_category
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
-        let(:created_product) { Spree::Product.find_by(products.except(:price, :stock_total, :slug)) }
+        let(:created_product) { Spree::Product.find_by(products.slice(:name, :description, :available_on, :shipping_category)) }
 
         it 'assigns stock_total as count_on_hand to default location' do
           subject
@@ -106,10 +116,36 @@ RSpec.describe Product::Repository do
             available_on: product.available_on,
             slug: product.slug,
             stock_total: nil,
-            shipping_category: shipping_category
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
-        let(:created_product) { Spree::Product.find_by(products.except(:price, :stock_total, :slug)) }
+        let(:created_product) { Spree::Product.find_by(products.slice(:name, :description, :available_on, :shipping_category)) }
+
+        it 'does not assign stock_total as count_on_hand to default location' do
+          subject
+
+          expect(created_product.stock_items.find_by(stock_location: stock_location).count_on_hand).to eq 0
+        end
+      end
+
+      context 'when stock_location is not given' do
+        let!(:product) { build(:product) }
+        let(:products) {
+          {
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            available_on: product.available_on,
+            slug: product.slug,
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: nil,
+            taxons: [taxon]
+          }
+        }
+        let(:created_product) { Spree::Product.find_by(products.slice(:name, :description, :available_on, :shipping_category)) }
 
         it 'does not assign stock_total as count_on_hand to default location' do
           subject
@@ -130,8 +166,10 @@ RSpec.describe Product::Repository do
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            shipping_category: shipping_category
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
 
@@ -148,8 +186,10 @@ RSpec.describe Product::Repository do
             price: nil,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            shipping_category: shipping_category
+            stock_total: stock_total,
+            shipping_category: shipping_category,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
 
@@ -159,7 +199,7 @@ RSpec.describe Product::Repository do
         end
       end
 
-      context 'when category attribute is missing' do
+      context 'when shipping_category attribute is missing' do
         let(:products) {
           {
             name: product.name,
@@ -167,8 +207,10 @@ RSpec.describe Product::Repository do
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            shipping_category: nil
+            stock_total: stock_total,
+            shipping_category: nil,
+            stock_location: stock_location,
+            taxons: [taxon]
           }
         }
 
