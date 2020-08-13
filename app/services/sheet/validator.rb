@@ -5,6 +5,8 @@ require 'dry-schema'
 require 'csv'
 
 class Sheet::Validator < Dry::Validation::Contract
+  REQUIRED_COLUMNS = ['name', 'description', 'price', 'availability_date', 'slug', 'stock_total', 'category'].freeze
+  private_constant :REQUIRED_COLUMNS
   # TODO: Sprawdzic czy input jest plikiem
   # TODO: - niech csv bedzie tworzony przy uzyciu factories
   # TODO: moze sprawdzac czy wartosci sa rozdzielone przecinkiem?
@@ -43,10 +45,8 @@ class Sheet::Validator < Dry::Validation::Contract
   end
 
   def required_columns_given?(value)
-    # Radek required columns do constanta private_constant
-    required_columns = ['name', 'description', 'price', 'availability_date', 'slug', 'stock_total', 'category']
     given_columns = CSV.parse(File.read(value[:file]), col_sep: ';', headers: true).headers
-    (required_columns - given_columns).empty?
+    (REQUIRED_COLUMNS - given_columns).empty?
   end
 
   def any_row_given?(value)
