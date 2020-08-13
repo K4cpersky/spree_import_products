@@ -43,6 +43,7 @@ class Sheet::Validator < Dry::Validation::Contract
   end
 
   def required_columns_given?(value)
+    # Radek required columns do constanta private_constant
     required_columns = ['name', 'description', 'price', 'availability_date', 'slug', 'stock_total', 'category']
     given_columns = CSV.parse(File.read(value[:file]), col_sep: ';', headers: true).headers
     (required_columns - given_columns).empty?

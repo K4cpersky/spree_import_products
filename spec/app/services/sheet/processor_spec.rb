@@ -10,8 +10,9 @@ RSpec.describe Sheet::Processor do
     end
     let(:table) { CSV.parse(File.read(data[:file]), col_sep: ';', headers: true) }
 
-    let(:headers) { table.headers.compact.all? { |element| element.class == String } }
-    let(:parsed_headers) { subject.products.map { |product| product.keys.all? { |key| key.class == Symbol } }.uniq.first }
+    let(:string_headers) { table.headers.compact.all? { |element| element.class == String } }
+    let(:headers_parsed_to_symbols) { subject.products.map { |product| product.keys.all? { |key| key.class == Symbol } }.uniq.first }
+    let(:parsed_headers) { subject.products.map(&:keys).flatten.uniq }
 
     let(:availability_date_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:availability_date)}.uniq.first }
     let(:available_on_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:available_on)}.uniq.first }
@@ -27,17 +28,17 @@ RSpec.describe Sheet::Processor do
 
     let(:table_length) { 21 }
     let(:products_amount) { 3 }
-    let(:row_length) { 8 }
     let(:parsed_row_length) { 7 }
+    let(:whitelisted_columns) { Sheet::Processor::COLUMNS_WHITELIST }
     let(:parsed_products_amount) { subject.products.length }
 
     it 'converts headers to symbols' do
-      expect(headers).to be true
+      expect(string_headers).to be true
       expect(subject.products).to be_empty
 
       subject.call
 
-      expect(parsed_headers).to be true
+      expect(headers_parsed_to_symbols).to be true
     end
 
     it 'renames available_on column' do
@@ -85,12 +86,17 @@ RSpec.describe Sheet::Processor do
       expect(parsed_products_amount).to eq products_amount
     end
 
-    it 'removes blank values from row' do
-      expect(table.first.length).to eq row_length
-
+    it 'does not reject blank values from rows' do
       subject.call
 
-      expect(subject.products.first.length).to eq parsed_row_length
+      expect(subject.products.second.length).to eq parsed_row_length
+    end
+
+    it 'takes only whitelisted columns' do
+      subject.call
+
+      expect(parsed_headers.length).to eq whitelisted_columns.length
+      expect(parsed_headers - whitelisted_columns).to be_empty
     end
 
     it 'returns same amount of objects' do

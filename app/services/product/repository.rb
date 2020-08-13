@@ -1,19 +1,14 @@
 class Product::Repository
-  def self.call(table)
+  def self.create(attributes)
     # TODO: do something with category and stock location
-    # Spree::StockLocation.find_or_create_by(name: 'Central Port in Washington')
-    Spree::Product.transaction do
-      table.each do |element|
-        attributes = element.slice(:name, :description, :available_on, :slug).merge(shipping_category: shipping_category(element))
-        product = Spree::Product.where(attributes).first_or_initialize
-        product.price = element[:price]
-        product.save!
-        product.stock_items.first.set_count_on_hand element[:stock_total] if element[:stock_total]
-      end
-    end
+    # TODO: fix this first_or_initialize logic is wrong
+    product = Spree::Product.where(attributes.except(:price, :stock_total)).first_or_initialize
+    product.price = attributes[:price]
+    product.save!
+    product.stock_items.find_by(stock_location: default_stock_location).set_count_on_hand attributes[:stock_total] if attributes[:stock_total]
   end
 
-  def self.shipping_category(element)
-    Spree::ShippingCategory.find_or_create_by(name: element[:category])
+  def self.default_stock_location
+    Spree::StockLocation.find_or_create_by(name: 'Default')
   end
 end

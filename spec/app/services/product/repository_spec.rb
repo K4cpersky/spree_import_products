@@ -1,229 +1,120 @@
 require 'spec_helper'
 
 RSpec.describe Product::Repository do
-  describe '.call' do
-    subject(:call) { described_class.call(products) }
+  describe '.create' do
+    subject(:product_repository) { described_class.create(products) }
 
     let!(:shipping_category) { create(:shipping_category, name: "Bags") }
-    let!(:stock_location) { create(:stock_location) }
+    let!(:stock_location) { create(:stock_location, name: "Default") }
 
     context 'when data is valid' do
       context 'when one product is imported' do
         let(:product) { build(:product) }
         let(:products) {
-          [{
+          {
             name: product.name,
             description: product.description,
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
             stock_total: 15,
-            category: "Bags"
-          }]
+            shipping_category: shipping_category
+          }
         }
 
         it 'saves product to database' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length)
-        end
-
-        it 'uses existing shipping category record' do
-          expect { subject }.to change { Spree::ShippingCategory.count }.by(0)
+          expect { subject }.to change { Spree::Product.count }.by(1)
         end
       end
 
       context 'when imported product already exists' do
         let!(:product) { create(:product) }
         let(:products) {
-          [{
+          {
             name: product.name,
             description: product.description,
             price: product.price,
             available_on: product.available_on,
             slug: product.slug,
             stock_total: 15,
-            category: "Bags"
-          }]
+            shipping_category: shipping_category
+          }
         }
 
         it 'does not save product again' do
-          call
+          subject
 
           expect { subject }.to change { Spree::Product.count }.by(0)
-        end
-      end
-
-      context 'when imported product has unwanted columns' do
-        let!(:product) { build(:product) }
-        let(:products) {
-          [{
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            available_on: product.available_on,
-            slug: product.slug,
-            stock_total: 15,
-            category: "Bags",
-            some_unwanted_column: "Spam",
-            another_unwanted_column: "Spam"
-          }]
-        }
-
-        it 'selects only whitelisted columns and saves product to database' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length)
         end
       end
 
       context 'when imported product has empty description, available_on, slug and stock_total attributes' do
         let!(:product) { build(:product) }
         let(:products) {
-          [{
+          {
             name: product.name,
             description: nil,
             price: product.price,
             available_on: nil,
             slug: nil,
             stock_total: nil,
-            category: "Bags"
-          }]
+            shipping_category: shipping_category
+          }
         }
 
         it 'saves product to database anyway because these attributes are optional' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length)
+          expect { subject }.to change { Spree::Product.count }.by(1)
         end
       end
 
-      context 'when imported product has unexisting category in database' do
+      context 'when stock_total is given' do
         let!(:product) { build(:product) }
+        let!(:additional_stock_location) { create(:stock_location) }
         let(:products) {
-          [{
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            available_on: product.available_on,
-            slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            category: "Glass"
-          }]
-        }
-
-        it 'creates new shipping category record' do
-          expect { subject }.to change { Spree::ShippingCategory.count }.by(1)
-        end
-
-        it 'saves product to database' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length)
-        end
-      end
-
-      context 'when many products are imported' do
-        let(:products) {
-          [{
-            name: attributes_for(:product)[:name],
-            description: attributes_for(:product)[:description],
-            price: attributes_for(:product)[:price],
-            available_on: attributes_for(:product)[:available_on],
-            slug: "ruby-on-rails-bag",
-            stock_total: 15,
-            category: "Bags"
-          },
           {
-            name: attributes_for(:product)[:name],
-            description: attributes_for(:product)[:description],
-            price: attributes_for(:product)[:price],
-            available_on: attributes_for(:product)[:available_on],
-            slug: "spree-bag",
-            stock_total: 5,
-            category: "Bags"
-          },
-          {
-            name: attributes_for(:product)[:name],
-            description: attributes_for(:product)[:description],
-            price: attributes_for(:product)[:price],
-            available_on: attributes_for(:product)[:available_on],
-            slug: "spree-tote",
-            stock_total: 20,
-            category: "Bags"
-          }]
-        }
-
-        it 'saves products to database' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length)
-        end
-      end
-
-      context 'when some of imported products already exists' do
-        let!(:product) { create(:product) }
-        let(:products) {
-          [{
             name: product.name,
             description: product.description,
             price: product.price,
             available_on: product.available_on,
             slug: product.slug,
-            stock_total: 15,
-            category: "Bags"
-          },
-          {
-            name: attributes_for(:product)[:name],
-            description: attributes_for(:product)[:description],
-            price: attributes_for(:product)[:price],
-            available_on: attributes_for(:product)[:available_on],
-            slug: "spree-bag",
-            stock_total: 5,
-            category: "Bags"
-          },
-          {
-            name: attributes_for(:product)[:name],
-            description: attributes_for(:product)[:description],
-            price: attributes_for(:product)[:price],
-            available_on: attributes_for(:product)[:available_on],
-            slug: "spree-tote",
-            stock_total: 20,
-            category: "Bags"
-          }]
+            stock_total: 7,
+            shipping_category: shipping_category
+          }
         }
+        let(:created_product) { Spree::Product.find_by(products.except(:price, :stock_total, :slug)) }
 
-        it 'does not save only existing product to database' do
-          expect { subject }.to change { Spree::Product.count }.by(products.length - 1)
+        it 'assigns stock_total as count_on_hand to default location' do
+          subject
+
+          expect(created_product.stock_items.find_by(stock_location: stock_location).count_on_hand).to eq products[:stock_total]
+        end
+
+        it 'does not assign stock_total to any other location than default' do
+          subject
+
+          expect(created_product.stock_items.find_by(stock_location: additional_stock_location).count_on_hand).to eq 0
         end
       end
 
-      context 'when every imported product already exists' do
-        let!(:product_one) { create(:product) }
-        let!(:product_two) { create(:product) }
-        let!(:product_three) { create(:product) }
+      context 'when stock_total is not given' do
+        let!(:product) { build(:product) }
         let(:products) {
-          [{
-            name: product_one.name,
-            description: product_one.description,
-            price: product_one.price,
-            available_on: product_one.available_on,
-            slug: product_one.slug,
-            stock_total: 15,
-            category: "Bags"
-          },
           {
-            name: product_two.name,
-            description: product_two.description,
-            price: product_two.price,
-            available_on: product_two.available_on,
-            slug: product_two.slug,
-            stock_total: 5,
-            category: "Bags"
-          },
-          {
-            name: product_three.name,
-            description: product_three.description,
-            price: product_three.price,
-            available_on: product_three.available_on,
-            slug: product_three.slug,
-            stock_total: 20,
-            category: "Bags"
-          }]
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            available_on: product.available_on,
+            slug: product.slug,
+            stock_total: nil,
+            shipping_category: shipping_category
+          }
         }
+        let(:created_product) { Spree::Product.find_by(products.except(:price, :stock_total, :slug)) }
 
-        it 'does not save any product to database' do
-          expect { subject }.to change { Spree::Product.count }.by(0)
+        it 'does not assign stock_total as count_on_hand to default location' do
+          subject
+
+          expect(created_product.stock_items.find_by(stock_location: stock_location).count_on_hand).to eq 0
         end
       end
     end
@@ -233,15 +124,15 @@ RSpec.describe Product::Repository do
 
       context 'when name attribute is missing' do
         let(:products) {
-          [{
+          {
             name: nil,
             description: product.description,
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
             stock_total: 15,
-            category: "Bags"
-          }]
+            shipping_category: shipping_category
+          }
         }
 
         it 'raises name must be present error' do
@@ -251,15 +142,15 @@ RSpec.describe Product::Repository do
 
       context 'when price attribute is missing' do
         let(:products) {
-          [{
+          {
             name: product.name,
             description: product.description,
             price: nil,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
             stock_total: 15,
-            category: "Bags"
-          }]
+            shipping_category: shipping_category
+          }
         }
 
         it 'raises price must be present error' do
@@ -270,15 +161,15 @@ RSpec.describe Product::Repository do
 
       context 'when category attribute is missing' do
         let(:products) {
-          [{
+          {
             name: product.name,
             description: product.description,
             price: product.price,
             available_on: product.available_on,
             slug: "ruby-on-rails-bag",
             stock_total: 15,
-            category: nil
-          }]
+            shipping_category: nil
+          }
         }
 
         it 'raises category must be present error' do

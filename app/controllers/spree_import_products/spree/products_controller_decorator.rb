@@ -1,19 +1,19 @@
 module SpreeImportProducts
   module Spree
     module ProductsControllerDecorator
-      # def self.prepended(base)
-      #   base.before_action :load_data, only: :some_action
-      # end
-
       def import
-        Product::Service.call(import_permitted_params)
+        product_service.import(import_params)
 
         head :ok
       end
 
       private
 
-      def import_permitted_params
+      def product_service
+        @product_service ||= Product.new
+      end
+
+      def import_params
         params.require(:data).require(:attributes).permit(:file)
       end
     end
