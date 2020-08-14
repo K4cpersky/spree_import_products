@@ -4,7 +4,9 @@ class Product::Repository
       product.price = attributes[:price]
       product.assign_attributes(taxons: attributes[:taxons]) if attributes[:taxons]
       product.save!
-      product.stock_items.find_by(stock_location: attributes[:stock_location]).set_count_on_hand attributes[:stock_total] if attributes[:stock_total] && attributes[:stock_location]
+      if attributes[:stock_total] && attributes[:stock_location]
+        product.stock_items.find_by(stock_location: attributes[:stock_location]).set_count_on_hand attributes[:stock_total]
+      end
     end
   end
 end

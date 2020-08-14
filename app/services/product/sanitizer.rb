@@ -12,11 +12,11 @@ class Product::Sanitizer
   private
 
   def default_shipping_category
-    Spree::ShippingCategory.find_or_create_by(name: "Default")
+    Spree::ShippingCategory.find_or_create_by(name: 'Default')
   end
 
   def default_stock_location
-    Spree::StockLocation.find_or_create_by(name: "Default")
+    Spree::StockLocation.find_or_create_by(name: 'Default')
   end
 
   def taxon(params)
