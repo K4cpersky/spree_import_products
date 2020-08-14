@@ -4,6 +4,8 @@ RSpec.describe Sheet::Processor do
   describe '.call' do
     subject(:call) { described_class.new(data) }
 
+    WHITELISTED_COLUMNS = [:name, :description, :price, :available_on, :slug, :stock_total, :category].freeze
+
     let(:file) { fixture_file_upload('spec/factories/files/sample.csv', 'text/csv') }
     let(:data) do
       { file: file }
@@ -29,7 +31,6 @@ RSpec.describe Sheet::Processor do
     let(:table_length) { 21 }
     let(:products_amount) { 3 }
     let(:parsed_row_length) { 7 }
-    let(:whitelisted_columns) { Sheet::Processor::COLUMNS_WHITELIST }
     let(:parsed_products_amount) { subject.products.length }
 
     it 'converts headers to symbols' do
@@ -95,8 +96,8 @@ RSpec.describe Sheet::Processor do
     it 'takes only whitelisted columns' do
       subject.call
 
-      expect(parsed_headers.length).to eq whitelisted_columns.length
-      expect(parsed_headers - whitelisted_columns).to be_empty
+      expect(parsed_headers.length).to eq WHITELISTED_COLUMNS.length
+      expect(parsed_headers - WHITELISTED_COLUMNS).to be_empty
     end
 
     it 'returns same amount of objects' do

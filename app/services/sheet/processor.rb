@@ -1,7 +1,8 @@
 require 'csv'
 
 class Sheet::Processor
-  COLUMNS_WHITELIST = [:name, :description, :price, :available_on, :slug, :stock_total, :category].freeze
+  WHITELISTED_COLUMNS = [:name, :description, :price, :available_on, :slug, :stock_total, :category].freeze
+  private_constant :WHITELISTED_COLUMNS
 
   attr_reader :products
 
@@ -39,6 +40,6 @@ class Sheet::Processor
   private
 
   def push_row(row)
-    @products << row.to_hash.slice(*COLUMNS_WHITELIST)
+    @products << row.to_hash.slice(*WHITELISTED_COLUMNS)
   end
 end

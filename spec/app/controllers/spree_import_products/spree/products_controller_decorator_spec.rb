@@ -8,9 +8,6 @@ RSpec.describe Spree::ProductsController, type: :controller do
 
     shared_examples 'product service called' do
       it 'calls product service' do
-        ActionController::Parameters.permit_all_parameters = true
-        import_permitted_params = ActionController::Parameters.new(file: file)
-
         post_import
       end
     end
