@@ -11,7 +11,6 @@ class Sheet::Processor
     @products = []
   end
   # TODO: Should it be here?
-  # Radek folder tools, w lamdzie do endy
   CSV::Converters[:price] = lambda do |value, field_info|
     case field_info.header
     when :price
