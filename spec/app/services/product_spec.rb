@@ -8,26 +8,5 @@ RSpec.describe Product do
     let(:sheet) do
       { file: file }
     end
-    # let(:table) { Sheet.call(sheet) }
-
-    # TODO
-    # it 'calls sheet service' do
-    #   expect(Sheet.new)
-    #     .to receive(:parse_rows)
-    #     .with(sheet)
-    #     .and_call_original
-    #
-    #   import
-    # end
-
-    # TODO
-    # it 'product repository' do
-    #   expect(Product::Repository)
-    #     .to receive(:call)
-    #     .with(table)
-    #     .and_call_original
-    #
-    #   import
-    # end
   end
 end

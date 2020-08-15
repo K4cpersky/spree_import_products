@@ -4,14 +4,18 @@ class Product
 
     return Product::ImportResult.new(sheet_errors: parse_result.errors) unless parse_result.success?
 
-    Product::Importer.import(parse_result.rows)
+    product_importer.import(parse_result.rows)
 
-    Product::ImportResult.new(import_errors: parse_result.errors)
+    Product::ImportResult.new(saved_records: product_importer.saved_records, import_errors: product_importer.invalid_records)
   end
 
   private
 
   def sheet_service
     @sheet_service ||= Sheet.new
+  end
+
+  def product_importer
+    @product_importer ||= Product::Importer.new
   end
 end

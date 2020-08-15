@@ -8,14 +8,5 @@ RSpec.describe Sheet do
     let(:sheet) do
       { file: file }
     end
-
-    # TODO
-    # it 'calls validator' do
-    #   expect(Sheet::Validator.new)
-    #     .to receive(:call)
-    #     .with(file: sheet)
-    #
-    #   parse_rows
-    # end
   end
 end

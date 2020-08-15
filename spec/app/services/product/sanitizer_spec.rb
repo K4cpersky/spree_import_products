@@ -23,15 +23,29 @@ RSpec.describe Product::Sanitizer do
       expect(sanitize).to include(stock_location: stock_location)
     end
 
+    it 'removes category from attributes' do
+      expect(sanitize).not_to include(params)
+    end
+
     context 'when category param is given' do
       let(:params) { {category: taxon_name} }
 
-      it 'adds taxons key with nil value' do
+      it 'adds taxons key with found object' do
         expect(sanitize).to include(taxons: [taxon])
       end
 
-      it 'removes category from attributes' do
-        expect(sanitize).not_to include(params)
+      context 'when taxon is found' do
+        let!(:taxon) { create(:taxon, name: taxon_name) }
+
+        it 'does not create additional taxon' do
+          expect { sanitize }.to change { Spree::Taxon.count }.by(0)
+        end
+      end
+
+      context 'when taxon is not found' do
+        it 'creates new taxon by provided name' do
+          expect { sanitize }.to change { Spree::Taxon.count }.by(1)
+        end
       end
     end
 
@@ -40,6 +54,20 @@ RSpec.describe Product::Sanitizer do
 
       it 'adds taxons key with nil value' do
         expect(sanitize).to include(taxons: [nil])
+      end
+    end
+
+    context 'when shipping_category is found' do
+      let!(:shipping_category) { create(:shipping_category, name: "Default") }
+
+      it 'does not create additional taxon' do
+        expect { sanitize }.to change { Spree::ShippingCategory.count }.by(0)
+      end
+    end
+
+    context 'when shipping_category is not found' do
+      it 'creates new taxon by provided name' do
+        expect { sanitize }.to change { Spree::ShippingCategory.count }.by(1)
       end
     end
 

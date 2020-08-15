@@ -15,7 +15,7 @@ RSpec.describe Spree::ProductsController, type: :controller do
 
     let(:response_data) { JSON.parse(response.body) }
 
-    context 'when data is valid' do
+    context 'when file is valid' do
       let(:file) { fixture_file_upload('spec/factories/files/sample.csv', 'text/csv') }
 
       it 'has status 200' do
@@ -69,7 +69,7 @@ RSpec.describe Spree::ProductsController, type: :controller do
       end
     end
 
-    context 'when data is invalid' do
+    context 'when file is invalid' do
       shared_examples 'unprocessable_entity response status' do
         it 'has status 422' do
           post_import
