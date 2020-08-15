@@ -12,7 +12,7 @@ class Product::Importer
       product_repository.create(product_sanitizer.sanitize(element))
 
       if product_repository.success?
-        @saved_records << product_repository.product_id
+        @saved_records << product_repository.product_id unless product_repository.product_id.nil?
       else
         @invalid_records << { row: index + 1, errors: product_repository.errors }
       end

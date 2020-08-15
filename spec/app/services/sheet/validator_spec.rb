@@ -31,7 +31,7 @@ RSpec.describe Sheet::Validator do
     end
 
     context 'when data has wrong content type' do
-      let(:file) { fixture_file_upload('spec/factories/files/sample.txt', 'text/plain') }
+      let(:file) { fixture_file_upload('spec/factories/files/sheet_errors/sample.txt', 'text/plain') }
       let(:data) do
         { file: file }
       end
@@ -43,7 +43,7 @@ RSpec.describe Sheet::Validator do
     end
 
     context 'when file is empty' do
-      let(:file) { fixture_file_upload('spec/factories/files/empty_file_sample.csv', 'text/csv') }
+      let(:file) { fixture_file_upload('spec/factories/files/sheet_errors/empty_file_sample.csv', 'text/csv') }
       let(:data) do
         { file: file }
       end
@@ -55,7 +55,7 @@ RSpec.describe Sheet::Validator do
     end
 
     context 'when some columns are missing' do
-      let(:file) { fixture_file_upload('spec/factories/files/column_missing_sample.csv', 'text/csv') }
+      let(:file) { fixture_file_upload('spec/factories/files/sheet_errors/column_missing_sample.csv', 'text/csv') }
       let(:data) do
         { file: file }
       end
@@ -67,7 +67,7 @@ RSpec.describe Sheet::Validator do
     end
 
     context 'when rows are blank' do
-      let(:file) { fixture_file_upload('spec/factories/files/blank_rows_sample.csv', 'text/csv') }
+      let(:file) { fixture_file_upload('spec/factories/files/sheet_errors/blank_rows_sample.csv', 'text/csv') }
       let(:data) do
         { file: file }
       end

@@ -5,7 +5,7 @@ module SpreeImportProducts
         result = product_service.import(import_params)
 
         if result.success?
-          head :ok
+          render json: { product_ids: result.saved_records, import_errors: result.import_errors }, status: :ok
         else
           render json: { errors: result.sheet_errors }, status: :unprocessable_entity
         end

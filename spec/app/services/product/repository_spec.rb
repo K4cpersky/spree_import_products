@@ -88,7 +88,7 @@ RSpec.describe Product::Repository do
             stock_total: nil,
             shipping_category: shipping_category,
             stock_location: stock_location,
-            taxons: nil
+            taxons: []
           }
         }
 
