@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'json'
 
 RSpec.describe Spree::ProductsController, type: :controller do
   describe 'POST #import' do
@@ -11,6 +12,8 @@ RSpec.describe Spree::ProductsController, type: :controller do
         expect { subject }.to change { Spree::Product.count }.by(0)
       end
     end
+
+    let(:response_data) { JSON.parse(response.body) }
 
     context 'when data is valid' do
       let(:file) { fixture_file_upload('spec/factories/files/sample.csv', 'text/csv') }
@@ -67,15 +70,76 @@ RSpec.describe Spree::ProductsController, type: :controller do
     end
 
     context 'when data is invalid' do
+      shared_examples 'unprocessable_entity response status' do
+        it 'has status 422' do
+          post_import
+
+          expect(response.status).to eq(422)
+        end
+      end
+
       context 'when file is missing' do
         let(:file) { nil }
 
         it_should_behave_like 'products not saved'
+        it_should_behave_like 'unprocessable_entity response status'
 
-        it 'has status 200' do
+        it 'contains valid response data' do
           post_import
 
-          expect(response.status).to eq(200)
+          expect(response_data["errors"]).to include({"file"=>["is missing"]})
+        end
+      end
+
+      context 'when file has wrong content type' do
+        let(:file) { fixture_file_upload('spec/factories/files/sample.txt', 'text/plain') }
+
+        it_should_behave_like 'products not saved'
+        it_should_behave_like 'unprocessable_entity response status'
+
+        it 'contains valid response data' do
+          post_import
+
+          expect(response_data["errors"]).to include({"file"=>["wrong file content type"]})
+        end
+      end
+
+      context 'when file is empty' do
+        let(:file) { fixture_file_upload('spec/factories/files/empty_file_sample.csv', 'text/csv') }
+
+        it_should_behave_like 'products not saved'
+        it_should_behave_like 'unprocessable_entity response status'
+
+        it 'contains valid response data' do
+          post_import
+
+          expect(response_data["errors"]).to include({"file"=>["file is empty"]})
+        end
+      end
+
+      context 'when some columns are missing' do
+        let(:file) { fixture_file_upload('spec/factories/files/column_missing_sample.csv', 'text/csv') }
+
+        it_should_behave_like 'products not saved'
+        it_should_behave_like 'unprocessable_entity response status'
+
+        it 'contains valid response data' do
+          post_import
+
+          expect(response_data["errors"]).to include({"file"=>["some columns are missing"]})
+        end
+      end
+
+      context 'when rows are blank' do
+        let(:file) { fixture_file_upload('spec/factories/files/blank_rows_sample.csv', 'text/csv') }
+
+        it_should_behave_like 'products not saved'
+        it_should_behave_like 'unprocessable_entity response status'
+
+        it 'contains valid response data' do
+          post_import
+
+          expect(response_data["errors"]).to include({"file"=>["lack of rows"]})
         end
       end
     end

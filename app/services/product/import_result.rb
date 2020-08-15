@@ -1,5 +1,5 @@
 class Product::ImportResult
-  attr_reader :sheet_errors, :import_errors
+  attr_reader :import_errors
 
   def initialize(sheet_errors: [], import_errors: [])
     @sheet_errors = sheet_errors
@@ -7,6 +7,10 @@ class Product::ImportResult
   end
 
   def success?
-    (@sheet_errors + @import_errors).empty?
+    @sheet_errors.empty?
+  end
+
+  def sheet_errors
+    @sheet_errors.map(&:to_h)
   end
 end

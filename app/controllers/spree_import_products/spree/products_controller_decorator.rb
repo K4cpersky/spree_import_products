@@ -2,9 +2,13 @@ module SpreeImportProducts
   module Spree
     module ProductsControllerDecorator
       def import
-        product_service.import(import_params)
+        result = product_service.import(import_params)
 
-        head :ok
+        if result.success?
+          head :ok
+        else
+          render json: { errors: result.sheet_errors }, status: :unprocessable_entity
+        end
       end
 
       private
