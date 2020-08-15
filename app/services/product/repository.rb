@@ -1,6 +1,6 @@
 class Product::Repository
   def self.create(attributes)
-    Spree::Product.find_or_initialize_by(attributes.except(:price, :stock_total, :stock_location, :taxons)) do |product|
+    Spree::Product.where(slug: attributes[:slug]).first_or_initialize(attributes.except(:price, :stock_total, :stock_location, :taxons)) do |product|
       product.price = attributes[:price]
       product.assign_attributes(taxons: attributes[:taxons]) if attributes[:taxons]
       product.save!

@@ -37,19 +37,19 @@ class Sheet::Validator < Dry::Validation::Contract
   private
 
   def csv_content_type?(value)
-    value[:file].content_type == 'text/csv'
+    value.content_type == 'text/csv'
   end
 
   def file_has_data?(value)
-    CSV.parse(File.read(value[:file]), col_sep: ';', headers: true).any?
+    CSV.parse(File.read(value), col_sep: ';', headers: true).any?
   end
 
   def required_columns_given?(value)
-    given_columns = CSV.parse(File.read(value[:file]), col_sep: ';', headers: true).headers
+    given_columns = CSV.parse(File.read(value), col_sep: ';', headers: true).headers
     (REQUIRED_COLUMNS - given_columns).empty?
   end
 
   def any_row_given?(value)
-    CSV.parse(File.read(value[:file]), col_sep: ';').drop(1).flatten.reject(&:blank?).any?
+    CSV.parse(File.read(value), col_sep: ';').drop(1).flatten.reject(&:blank?).any?
   end
 end

@@ -6,14 +6,10 @@ require 'spec_helper'
 RSpec.describe Sheet::Validator do
   subject(:call) { described_class.new.call(data) }
 
-  let(:sheet) do
-    { file: file }
-  end
-
   context 'when data is valid' do
     let(:file) { fixture_file_upload('spec/factories/files/sample.csv', 'text/csv') }
     let(:data) do
-      { file: sheet }
+      { file: file }
     end
 
     it 'returns no errors' do
@@ -37,7 +33,7 @@ RSpec.describe Sheet::Validator do
     context 'when data has wrong content type' do
       let(:file) { fixture_file_upload('spec/factories/files/sample.txt', 'text/plain') }
       let(:data) do
-        { file: sheet }
+        { file: file }
       end
 
       it 'returns file has wrong content type error' do
@@ -49,7 +45,7 @@ RSpec.describe Sheet::Validator do
     context 'when file is empty' do
       let(:file) { fixture_file_upload('spec/factories/files/empty_file_sample.csv', 'text/csv') }
       let(:data) do
-        { file: sheet }
+        { file: file }
       end
 
       it 'returns file is empty error' do
@@ -61,7 +57,7 @@ RSpec.describe Sheet::Validator do
     context 'when some columns are missing' do
       let(:file) { fixture_file_upload('spec/factories/files/column_missing_sample.csv', 'text/csv') }
       let(:data) do
-        { file: sheet }
+        { file: file }
       end
 
       it 'returns some columns are missing error' do
@@ -73,7 +69,7 @@ RSpec.describe Sheet::Validator do
     context 'when rows are blank' do
       let(:file) { fixture_file_upload('spec/factories/files/blank_rows_sample.csv', 'text/csv') }
       let(:data) do
-        { file: sheet }
+        { file: file }
       end
 
       it 'returns lack of rows error' do

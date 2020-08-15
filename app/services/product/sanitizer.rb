@@ -16,7 +16,7 @@ class Product::Sanitizer
   end
 
   def default_stock_location
-    Spree::StockLocation.find_or_create_by(name: 'Default')
+    Spree::StockLocation.find_by(name: 'Default')
   end
 
   def taxon(params)
