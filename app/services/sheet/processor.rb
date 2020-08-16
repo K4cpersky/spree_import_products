@@ -29,9 +29,13 @@ class Sheet::Processor
   end
 
   def call
-    args = [@sheet.path, col_sep: ';', headers: true, header_converters: [:map_headers, :symbol], converters: [:date_time, :integer, :price]]
-
-    CSV.foreach(*args) do |row|
+    CSV.foreach(
+      @sheet.path,
+      col_sep: ';',
+      headers: true,
+      header_converters: [:map_headers, :symbol],
+      converters: [:date_time, :integer, :price]
+    ) do |row|
       push_row(row) unless row.fields.all?(&:blank?)
     end
 
