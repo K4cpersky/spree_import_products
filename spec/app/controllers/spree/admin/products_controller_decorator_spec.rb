@@ -182,6 +182,17 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
         context 'when many rows are given' do
           let(:file) { fixture_file_upload('spec/factories/files/mixed_sample.csv', 'text/csv') }
           let(:created_products) { Spree::Product.last(12).pluck(:id) }
+          let(:expected_response) do
+            [
+              {"row"=>2, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>4, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>6, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>8, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>12, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>14, "errors"=>{"name"=>"can't be blank"}},
+              {"row"=>18, "errors"=>{"name"=>"can't be blank"}}
+            ]
+          end
 
           it 'saves some products to database' do
             expect { subject }.to change { Spree::Product.count }.by(12)
@@ -192,13 +203,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
 
             expect(response_data["product_ids"] - created_products).to be_empty
             expect(response_data["import_errors"].length).to eq 7
-            expect(response_data["import_errors"]).to include({"row"=>2, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>4, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>6, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>8, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>12, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>14, "errors"=>{"name"=>"can't be blank"}})
-            expect(response_data["import_errors"]).to include({"row"=>18, "errors"=>{"name"=>"can't be blank"}})
+            expect(response_data["import_errors"]).to match_array(expected_response)
           end
         end
       end
