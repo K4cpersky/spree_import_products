@@ -17,7 +17,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
 
     shared_examples 'products not saved' do
       it 'does not save any product to database' do
-        expect { subject }.to change { Spree::Product.count }.by(0)
+        expect { post_import }.to change { Spree::Product.count }.by(0)
       end
     end
 
@@ -43,11 +43,11 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:created_product) { Spree::Product.last }
 
             it 'saves that product to database' do
-              expect { subject }.to change { Spree::Product.count }.by(1)
+              expect { post_import }.to change { Spree::Product.count }.by(1)
             end
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"].first).to eq created_product.id
               expect(response_data["import_errors"]).to be_empty
@@ -63,7 +63,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             it_should_behave_like 'products not saved'
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"]).to be_empty
               expect(response_data["import_errors"]).to be_empty
@@ -80,11 +80,11 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:created_products) { Spree::Product.last(3).pluck(:id) }
 
             it 'saves all products to database' do
-              expect { subject }.to change { Spree::Product.count }.by(3)
+              expect { post_import }.to change { Spree::Product.count }.by(3)
             end
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"] - created_products).to be_empty
               expect(response_data["import_errors"]).to be_empty
@@ -99,11 +99,11 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:created_products) { Spree::Product.last(2).pluck(:id) }
 
             it 'saves other products to database' do
-              expect { subject }.to change { Spree::Product.count }.by(2)
+              expect { post_import }.to change { Spree::Product.count }.by(2)
             end
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"] - created_products).to be_empty
               expect(response_data["import_errors"]).to be_empty
@@ -120,7 +120,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             it_should_behave_like 'products not saved'
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"]).to be_empty
               expect(response_data["import_errors"]).to be_empty
@@ -137,7 +137,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:file) { fixture_file_upload('spec/factories/files/data_errors/blank_name_sample.csv', 'text/csv') }
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"]).to be_empty
               expect(response_data["import_errors"].length).to eq 1
@@ -152,7 +152,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:file) { fixture_file_upload('spec/factories/files/data_errors/blank_name_sample.csv', 'text/csv') }
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"]).to be_empty
               expect(response_data["import_errors"].length).to eq 1
@@ -167,7 +167,7 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
             let(:file) { fixture_file_upload('spec/factories/files/data_errors/blank_price_sample.csv', 'text/csv') }
 
             it 'contains valid response data' do
-              subject
+              post_import
 
               expect(response_data["product_ids"]).to be_empty
               expect(response_data["import_errors"].length).to eq 1
@@ -195,11 +195,11 @@ RSpec.describe Spree::Admin::ProductsController, type: :controller do
           end
 
           it 'saves some products to database' do
-            expect { subject }.to change { Spree::Product.count }.by(12)
+            expect { post_import }.to change { Spree::Product.count }.by(12)
           end
 
           it 'contains valid response data' do
-            subject
+            post_import
 
             expect(response_data["product_ids"] - created_products).to be_empty
             expect(response_data["import_errors"].length).to eq 7
