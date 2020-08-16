@@ -41,15 +41,15 @@ class Sheet::Validator < Dry::Validation::Contract
   end
 
   def file_has_data?(value)
-    CSV.parse(File.read(value), col_sep: ';', headers: true).any?
+    CSV.parse(File.read(value.path), col_sep: ';', headers: true).any?
   end
 
   def required_columns_given?(value)
-    given_columns = CSV.parse(File.read(value), col_sep: ';', headers: true).headers
+    given_columns = CSV.parse(File.read(value.path), col_sep: ';', headers: true).headers
     (REQUIRED_COLUMNS - given_columns).empty?
   end
 
   def any_row_given?(value)
-    CSV.parse(File.read(value), col_sep: ';').drop(1).flatten.reject(&:blank?).any?
+    CSV.parse(File.read(value.path), col_sep: ';').drop(1).flatten.reject(&:blank?).any?
   end
 end
