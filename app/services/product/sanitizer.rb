@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Product::Sanitizer
   ATTRIBUTES = [:name, :description, :price, :available_on, :slug, :stock_total].freeze
 

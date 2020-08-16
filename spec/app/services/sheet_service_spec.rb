@@ -1,6 +1,6 @@
 require 'spec_helper'
-#TODO: Ogarnij stabowanie i mockowanie
-RSpec.describe Sheet do
+
+RSpec.describe SheetService do
   describe '.parse_rows' do
     subject(:parse_rows) { described_class.new.parse_rows(sheet) }
 

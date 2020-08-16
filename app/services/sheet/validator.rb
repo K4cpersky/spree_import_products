@@ -1,15 +1,12 @@
-# frozen_string_literal: true
-
 require 'dry-validation'
 require 'dry-schema'
 require 'csv'
 
 class Sheet::Validator < Dry::Validation::Contract
   REQUIRED_COLUMNS = ['name', 'description', 'price', 'availability_date', 'slug', 'stock_total', 'category'].freeze
+
   private_constant :REQUIRED_COLUMNS
-  # TODO: Sprawdzic czy input jest plikiem
-  # TODO: - niech csv bedzie tworzony przy uzyciu factories
-  # TODO: moze sprawdzac czy wartosci sa rozdzielone przecinkiem?
+
   params do
     required(:file)
   end
@@ -21,7 +18,7 @@ class Sheet::Validator < Dry::Validation::Contract
   rule(:file) do
     key.failure('file is empty') unless file_has_data?(value)
   end
-  # TODO: Nie do konca podoba mi sie ten blok if unless, ale w tym przypadku pasuje chyba
+
   rule(:file) do
     if file_has_data?(value)
       key.failure('some columns are missing') unless required_columns_given?(value)

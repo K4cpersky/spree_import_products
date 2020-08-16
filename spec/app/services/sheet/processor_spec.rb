@@ -18,7 +18,7 @@ RSpec.describe Sheet::Processor do
 
     let(:availability_date_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:availability_date)}.uniq.first }
     let(:available_on_presence) { subject.products.map(&:keys).map{ |keys| keys.include?(:available_on)}.uniq.first }
-    #TODO: Czy moze tak byc ze atrybut zmienia nazwe, testy nie sa odizolowane
+
     let(:availability_date_column_type) { table.by_col["availability_date"].compact.all? { |element| element.class == String } }
     let(:parsed_availability_date_column_type) { subject.products.map { |p| p[:available_on].class == DateTime }.uniq.first }
 

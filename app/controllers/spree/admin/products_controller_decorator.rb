@@ -1,5 +1,5 @@
-module SpreeImportProducts
-  module Spree
+module Spree
+  module Admin
     module ProductsControllerDecorator
       def import
         result = product_service.import(import_params)
@@ -14,7 +14,7 @@ module SpreeImportProducts
       private
 
       def product_service
-        @product_service ||= Product.new
+        @product_service ||= ProductService.new
       end
 
       def import_params
@@ -24,5 +24,5 @@ module SpreeImportProducts
   end
 end
 
-Spree::ProductsController.prepend SpreeImportProducts::Spree::ProductsControllerDecorator if
-  ::Spree::ProductsController.included_modules.exclude?(SpreeImportProducts::Spree::ProductsControllerDecorator)
+Spree::Admin::ProductsController.prepend Spree::Admin::ProductsControllerDecorator if
+  ::Spree::Admin::ProductsController.included_modules.exclude?(Spree::Admin::ProductsControllerDecorator)

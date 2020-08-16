@@ -1,4 +1,4 @@
-class Sheet
+class SheetService
   def parse_rows(sheet)
     errors = Sheet::Validator.new.call(parse_params_to_validator(sheet)).errors.to_h
 

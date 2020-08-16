@@ -1,6 +1,3 @@
-# frozen_string_literal: true
-# TODO: to keep frozen_string_literal or not to keep?
-
 require 'spec_helper'
 
 RSpec.describe Sheet::Validator do

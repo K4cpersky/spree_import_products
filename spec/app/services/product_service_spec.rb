@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe Product do
+RSpec.describe ProductService do
   describe '.import' do
     subject(:import) { described_class.new.import(sheet) }
 

@@ -1,4 +1,4 @@
-class Product
+class ProductService
   def import(sheet)
     parse_result = sheet_service.parse_rows(sheet)
 
@@ -12,7 +12,7 @@ class Product
   private
 
   def sheet_service
-    @sheet_service ||= Sheet.new
+    @sheet_service ||= SheetService.new
   end
 
   def product_importer

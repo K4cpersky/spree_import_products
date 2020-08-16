@@ -1,7 +1,15 @@
 require 'spec_helper'
 require 'json'
 
-RSpec.describe Spree::ProductsController, type: :controller do
+RSpec.describe Spree::Admin::ProductsController, type: :controller do
+  stub_authorization!
+
+  before do
+    reset_spree_preferences
+    user = build(:admin_user)
+    allow(controller).to receive(:try_spree_current_user).and_return(user)
+  end
+
   describe 'POST #import' do
     subject(:post_import) do
       post :import, params: { data: { attributes: { file: file } } }
@@ -49,7 +57,6 @@ RSpec.describe Spree::ProductsController, type: :controller do
           end
 
           context 'and this product already exists' do
-            #TODO ActiveRecord::ConnectionAdapters::SQLite3Adapter does not support skipping duplicates
             let!(:stock_location) { create(:stock_location, name: "Default") }
             let!(:product) { create(:product, slug: "ruby-on-rails-bag") }
 
